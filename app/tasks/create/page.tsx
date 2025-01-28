@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CiCirclePlus } from 'react-icons/ci';
+import { IoArrowBack } from 'react-icons/io5';
+import { RiCheckboxCircleLine } from 'react-icons/ri';
 
 interface ListItemProps {
   text: string;
@@ -18,19 +21,65 @@ const CreateItem: React.FC<ListItemProps> = ({
   onToggleComplete,
   onDelete,
 }) => {
+  const router = useRouter();
+  const colorPalette = [
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'purple',
+    'pink',
+    'teal',
+    'Khaki',
+  ];
+  const [selectedColor, setSelectedColor] = useState<string>('');
+
+  const backToHome = () => {
+    router.push('/');
+  };
+
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+  };
+
   return (
-    <div>
-      <p>Title</p>
-      <input
-        type='text'
-        placeholder='Ex. Brush your teeth'
-        className='bg-gray-400'
-        onChange={(e) => e.target.value}
-      ></input>
-      <p>Color</p>
-      <div className='flex flex-row w-1/2 h-8 bg-blue-500 justify-center items-center border-2 border-transparent hover:border-yellow-200'>
-        <p className='text-white text-sm font-semibold'>Create Task</p>
-        <CiCirclePlus className='pl-2 size-6 text-white stroke-[1]' />
+    <div className='relative w-full'>
+      <div className='flex flex-col absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 w-1/2 justify-center items-start'>
+        <IoArrowBack
+          onClick={backToHome}
+          className='text-white stroke-[2] mb-6'
+        />
+
+        {/* Task Input */}
+        <p className='text-blue-400 font-bold py-2 mt-4'>Title</p>
+        <input
+          type='text'
+          placeholder='Ex. Brush your teeth'
+          className='bg-zinc-600 h-8 w-full rounded-lg indent-2 p-2 text-sm text-white'
+          onChange={(e) => e.target.value}
+        ></input>
+        <p className='text-blue-400 font-bold py-2 mt-4'>Color</p>
+
+        {/* Select Color */}
+        <div className='flex space-x-4'>
+          {colorPalette.map((color) => (
+            <div
+              key={color}
+              onClick={() => handleColorSelect(color)}
+              className={`w-8 h-8 mb-8 rounded-full cursor-pointer ${
+                selectedColor === color ? 'border-2 border-white' : ''
+              }`}
+              style={{ backgroundColor: color }}
+            ></div>
+          ))}
+        </div>
+
+        {/* Save the task */}
+        <div className='flex flex-row w-full h-8 bg-blue-500 justify-center items-center rounded-lg border-2 border-transparent hover:border-white'>
+          <p className='text-white text-sm font-semibold '>Add Task</p>
+          <CiCirclePlus className='pl-2 size-6 text-white stroke-[1]' />
+        </div>
       </div>
     </div>
   );

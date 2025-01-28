@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { IoMdRocket } from 'react-icons/io';
 import React from 'react';
 import './globals.css';
 
@@ -32,6 +33,7 @@ export default function RootLayout({
           <div className='flex-1'>
             {/* Top section (1/4 black) */}
             <section className='h-1/4 w-full bg-black flex justify-center items-center'>
+              <IoMdRocket className='pl-2 size-10 text-blue-400 stroke-[1] mr-2' />
               <h1 className='font-bold font-sans text-white text-3xl'>
                 <span className='text-blue-400'>Todo </span>
                 <span className='text-purple-400'>App</span>
