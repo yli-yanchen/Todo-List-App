@@ -2,11 +2,34 @@
 
 import { useState } from 'react';
 import { CiCirclePlus } from 'react-icons/ci';
+import { LuNotebookText } from 'react-icons/lu';
+
+import ListItem from './components/ListItem';
+
+interface Task {
+  id: number;
+  text: string;
+  isCompleted: boolean;
+}
 
 export default function ToDoList() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const totalCount = tasks.length || 0;
-  const completedCount = tasks.filter((task) => task.completed).length;
+  const completedCount = tasks.filter((task) => task.isCompleted).length;
+
+  // Toggle task completion
+  const handleToggleCompletion = (taskId: number) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task
+      )
+    );
+  };
+
+  // Delete task
+  const handleDelete = (taskId: number) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  };
 
   return (
     <main className='h-screen flex flex-col bg-zinc-800'>
@@ -40,6 +63,29 @@ export default function ToDoList() {
               </p>
             </div>
             <div className='w-full h-px bg-gray-400 mt-2'></div>
+
+            {totalCount === 0 ? (
+              <div className='flex flex-col justify-center items-center my-16'>
+                <LuNotebookText className='pl-2 size-14 text-gray-400 stroke-[1]' />
+                <p className='text-gray-400 text-lg font-bold my-6'>
+                  You don't have any tasks registered yet.
+                </p>
+                <p className='text-gray-400 text-lg'>
+                  Create tasks and organize your to-do items.
+                </p>
+              </div>
+            ) : (
+              tasks.map((task) => (
+                <ListItem
+                  key={task.id}
+                  text={task.text}
+                  isCompleted={task.isCompleted}
+                  id={task.id}
+                  onToggleComplete={handleToggleCompletion}
+                  onDelete={handleDelete}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>
