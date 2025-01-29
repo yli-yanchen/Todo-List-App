@@ -1,28 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation'; // Use useParams for dynamic routing
 import { IoArrowBack } from 'react-icons/io5';
 import { RiCheckboxCircleLine } from 'react-icons/ri';
 
-interface ListItemProps {
-  text: string;
-  isCompleted: boolean;
-  id: number;
-  color: string;
-  onToggleComplete: (taskId: number) => void;
-  onDelete: (taskId: number) => void;
-}
-
-const EditItem: React.FC<ListItemProps> = ({
-  text,
-  isCompleted,
-  id,
-  color,
-  onToggleComplete,
-  onDelete,
-}) => {
+const EditItem: React.FC = () => {
   const router = useRouter();
+  const { id } = useParams();
   const colorPalette = [
     'red',
     'orange',
@@ -34,8 +19,29 @@ const EditItem: React.FC<ListItemProps> = ({
     'teal',
     'Khaki',
   ];
-  const [selectedColor, setSelectedColor] = useState<string>(color);
-  const [taskText, setTaskText] = useState<string>(text);
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [taskText, setTaskText] = useState<string>('');
+
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await fetch(`/api/tasks/${id}`);
+        if (response.ok) {
+          const taskData = await response.json();
+          setTaskText(taskData.text);
+          setSelectedColor(taskData.color);
+        } else {
+          alert('Failed to fetch task data');
+        }
+      } catch (error) {
+        alert('An error occurred while fetching the task data');
+      }
+    };
+
+    if (id) {
+      fetchTaskData();
+    }
+  }, [id]);
 
   const backToHome = () => {
     router.push('/');
@@ -55,7 +61,6 @@ const EditItem: React.FC<ListItemProps> = ({
         body: JSON.stringify({
           text: taskText,
           color: selectedColor,
-          isCompleted,
         }),
       });
 
@@ -68,14 +73,6 @@ const EditItem: React.FC<ListItemProps> = ({
       alert('An error occurred while updating the task');
     }
   };
-
-  useEffect(() => {
-    console.log('Text prop received:', text);
-    // Only update taskText if it's different from the current state
-    if (text !== taskText) {
-      setTaskText(text);
-    }
-  }, [text, taskText]);
 
   return (
     <div className='relative w-full'>

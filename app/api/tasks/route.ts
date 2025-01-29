@@ -42,22 +42,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-export async function PUT(req: NextRequest) {
-  const { id } = req.url.split('/').pop();
-  const { text, isCompleted } = await req.json();
-
-  try {
-    const task = await prisma.task.update({
-      where: { id: Number(id) },
-      data: { text, isCompleted },
-    });
-    return NextResponse.json(task);
-  } catch (error) {
-    console.error('Error updating task:', error);
-    return NextResponse.json(
-      { error: 'Failed to update task' },
-      { status: 500 }
-    );
-  }
-}
