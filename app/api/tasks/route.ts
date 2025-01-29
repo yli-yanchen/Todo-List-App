@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma';
 
-const prisma = new PrismaClient();
-
-// ✅ GET /api/tasks - Get all tasks
+// GET /api/tasks - Get all tasks
 export async function GET(req: NextRequest) {
   try {
     const tasks = await prisma.task.findMany();
     return NextResponse.json(tasks);
   } catch (error) {
+    console.error('Error fetching tasks:', error);
     return NextResponse.json(
       { error: 'Failed to fetch tasks' },
       { status: 500 }
@@ -16,7 +15,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// ✅ POST /api/tasks - Create a new task
+// POST /api/tasks - Create a new task
 export async function POST(req: NextRequest) {
   try {
     const { text, color } = await req.json();
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// ✅ PUT /api/tasks/[id] - Update a task
+// PUT /api/tasks/[id] - Update a task
 export async function PUT(req: NextRequest) {
   const { id } = req.url.split('/').pop(); // Get ID from URL
   const { title, isCompleted } = await req.json();
@@ -58,23 +57,6 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to update task' },
-      { status: 500 }
-    );
-  }
-}
-
-// ✅ DELETE /api/tasks/[id] - Delete a task
-export async function DELETE(req: NextRequest) {
-  const { id } = req.url.split('/').pop(); // Get ID from URL
-
-  try {
-    await prisma.task.delete({
-      where: { id: Number(id) },
-    });
-    return NextResponse.json({ message: 'Task deleted successfully' });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to delete task' },
       { status: 500 }
     );
   }

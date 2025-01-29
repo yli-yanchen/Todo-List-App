@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CiCirclePlus } from 'react-icons/ci';
 import { LuNotebookText } from 'react-icons/lu';
@@ -19,6 +19,25 @@ export default function ToDoList() {
   const totalCount = tasks.length || 0;
   const completedCount = tasks.filter((task) => task.isCompleted).length;
 
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch('/api/tasks');
+        if (response.ok) {
+          const tasks = await response.json();
+          setTasks(tasks);
+        } else {
+          alert('Failed to fetch tasks');
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+        alert('An error occurred while fetching tasks.');
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
   const handleNavigateToCreateTask = () => {
     console.log('Navigating to create task page');
     router.push('/tasks/create');
@@ -34,8 +53,21 @@ export default function ToDoList() {
   };
 
   // Delete task
-  const handleDelete = (taskId: number) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  const handleDelete = async (taskId: number) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      } else {
+        alert('Failed to delete the task.');
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      alert('An error occurred while deleting the task.');
+    }
   };
 
   return (
@@ -44,7 +76,7 @@ export default function ToDoList() {
         <div
           style={{ zIndex: 10 }}
           onClick={handleNavigateToCreateTask}
-          className='flex flex-row absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2 w-1/2 h-8 bg-blue-500 justify-center items-center border-2 border-transparent hover:border-yellow-200'
+          className='flex flex-row absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2 w-1/2 h-8 bg-blue-500 justify-center rounded-lg items-center border-2 border-transparent hover:border-yellow-200'
           tabIndex={0}
           role='button'
         >
@@ -72,10 +104,10 @@ export default function ToDoList() {
                 </span>
               </p>
             </div>
-            <div className='w-full h-px bg-gray-400 mt-2'></div>
 
             {totalCount === 0 ? (
-              <div className='flex flex-col justify-center items-center my-16'>
+              <div className='flex flex-col justify-center items-center'>
+                <div className='w-full h-px bg-gray-400 mt-4 mb-12'></div>
                 <LuNotebookText className='pl-2 size-14 text-gray-400 stroke-[1]' />
                 <p className='text-gray-400 text-lg font-bold my-6'>
                   You don't have any tasks registered yet.
@@ -91,6 +123,7 @@ export default function ToDoList() {
                   text={task.text}
                   isCompleted={task.isCompleted}
                   id={task.id}
+                  color={task.color}
                   onToggleComplete={handleToggleCompletion}
                   onDelete={handleDelete}
                 />
