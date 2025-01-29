@@ -33,7 +33,8 @@ const CreateItem: React.FC<ListItemProps> = ({
     'teal',
     'Khaki',
   ];
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('red');
+  const [taskText, setTaskText] = useState<string>('');
 
   const backToHome = () => {
     router.push('/');
@@ -41,6 +42,39 @@ const CreateItem: React.FC<ListItemProps> = ({
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
+  };
+
+  const createTask = async () => {
+    if (!taskText.trim()) {
+      alert('Please enter a task title.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: taskText,
+          color: selectedColor,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Task added successfully!');
+        setTaskText('');
+        setSelectedColor('');
+      } else {
+        alert(data.error || 'Failed to create task.');
+      }
+    } catch (error) {
+      alert('An error occurred while creating the task.');
+      console.error(error);
+    }
   };
 
   return (
@@ -57,7 +91,8 @@ const CreateItem: React.FC<ListItemProps> = ({
           type='text'
           placeholder='Ex. Brush your teeth'
           className='bg-zinc-600 h-8 w-full rounded-lg indent-2 p-2 text-sm text-white'
-          onChange={(e) => e.target.value}
+          value={taskText}
+          onChange={(e) => setTaskText(e.target.value)}
         ></input>
         <p className='text-blue-400 font-bold py-2 mt-4'>Color</p>
 
@@ -75,8 +110,11 @@ const CreateItem: React.FC<ListItemProps> = ({
           ))}
         </div>
 
-        {/* Save the task */}
-        <div className='flex flex-row w-full h-8 bg-blue-500 justify-center items-center rounded-lg border-2 border-transparent hover:border-white'>
+        {/* Add the task */}
+        <div
+          onClick={createTask}
+          className='flex flex-row w-full h-8 bg-blue-500 justify-center items-center rounded-lg border-2 border-transparent hover:border-white'
+        >
           <p className='text-white text-sm font-semibold '>Add Task</p>
           <CiCirclePlus className='pl-2 size-6 text-white stroke-[1]' />
         </div>
