@@ -73,28 +73,29 @@ export async function PUT(
   if (!id) {
     return NextResponse.json({ error: 'Task ID is required' }, { status: 400 });
   }
-  const { text, color } = await req.json();
 
   try {
+    const { isCompleted, text, color } = await req.json();
+
     const task = await prisma.task.findUnique({
       where: { id: Number(id) },
     });
+
     if (!task) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
-
     const updatedTask = await prisma.task.update({
       where: { id: Number(id) },
       data: {
-        text,
-        color,
+        ...(isCompleted !== undefined && { isCompleted }),
+        ...(text !== undefined && { text }),
+        ...(color !== undefined && { color }),
       },
     });
 
     return NextResponse.json(updatedTask);
   } catch (error) {
     console.error('Error updating task:', error);
-
     return NextResponse.json(
       { error: 'Failed to update task' },
       { status: 500 }

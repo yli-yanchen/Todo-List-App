@@ -106,7 +106,7 @@ const EditItem: React.FC = () => {
           ))}
         </div>
 
-        {/* Add the task */}
+        {/* Update the task */}
         <div
           onClick={handleSave}
           className='flex flex-row w-full h-8 bg-blue-500 justify-center items-center rounded-lg border-2 border-transparent hover:border-white'
