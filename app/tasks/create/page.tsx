@@ -10,6 +10,7 @@ interface ListItemProps {
   text: string;
   isCompleted: boolean;
   id: number;
+  color: string;
   onToggleComplete: (taskId: number) => void;
   onDelete: (taskId: number) => void;
 }
@@ -18,6 +19,7 @@ const CreateItem: React.FC<ListItemProps> = ({
   text,
   isCompleted,
   id,
+  color,
   onToggleComplete,
   onDelete,
 }) => {

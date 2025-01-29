@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { AiOutlineDelete } from 'react-icons/ai';
 
 interface ListItemProps {
@@ -18,6 +19,25 @@ const ListItem: React.FC<ListItemProps> = ({
   onToggleComplete,
   onDelete,
 }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (!id || isNaN(id)) {
+      console.error('Invalid task ID:', id);
+      return;
+    }
+    router.push(`/tasks/edit/${id}`);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!id || isNaN(id)) {
+      console.error('Invalid task ID for deletion:', id);
+      return;
+    }
+    onDelete(id);
+  };
+
   return (
     <li
       key={id}
@@ -32,10 +52,15 @@ const ListItem: React.FC<ListItemProps> = ({
           onChange={() => onToggleComplete(id)}
           className='ml-2 mr-4 my-2 rounded-full'
         />
-        <span className={`${isCompleted ? 'line-through' : ''}`}>{text}</span>
+        <span
+          onClick={handleClick}
+          className={`${isCompleted ? 'line-through text-gray-400' : ''}`}
+        >
+          {text}
+        </span>
       </div>
       <AiOutlineDelete
-        onClick={() => onDelete(id)}
+        onClick={handleDelete}
         className='text-white cursor-pointer mr-2 size-4'
       />
     </li>

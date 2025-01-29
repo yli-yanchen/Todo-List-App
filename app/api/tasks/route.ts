@@ -43,10 +43,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PUT /api/tasks/[id] - Update a task
 export async function PUT(req: NextRequest) {
-  const { id } = req.url.split('/').pop(); // Get ID from URL
-  const { title, isCompleted } = await req.json();
+  const { id } = req.url.split('/').pop();
+  const { text, isCompleted } = await req.json();
 
   try {
     const task = await prisma.task.update({
@@ -55,6 +54,7 @@ export async function PUT(req: NextRequest) {
     });
     return NextResponse.json(task);
   } catch (error) {
+    console.error('Error updating task:', error);
     return NextResponse.json(
       { error: 'Failed to update task' },
       { status: 500 }

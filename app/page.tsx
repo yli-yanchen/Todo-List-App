@@ -11,6 +11,7 @@ interface Task {
   id: number;
   text: string;
   isCompleted: boolean;
+  color: string;
 }
 
 export default function ToDoList() {
@@ -117,17 +118,20 @@ export default function ToDoList() {
                 </p>
               </div>
             ) : (
-              tasks.map((task) => (
-                <ListItem
-                  key={task.id}
-                  text={task.text}
-                  isCompleted={task.isCompleted}
-                  id={task.id}
-                  color={task.color}
-                  onToggleComplete={handleToggleCompletion}
-                  onDelete={handleDelete}
-                />
-              ))
+              tasks.map((task) => {
+                console.log('Task text: ', task.text);
+                return (
+                  <ListItem
+                    key={task.id}
+                    text={task.text}
+                    isCompleted={task.isCompleted}
+                    id={task.id}
+                    color={task.color}
+                    onToggleComplete={handleToggleCompletion}
+                    onDelete={handleDelete}
+                  />
+                );
+              })
             )}
           </div>
         </div>

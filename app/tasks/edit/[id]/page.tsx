@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IoArrowBack } from 'react-icons/io5';
 import { RiCheckboxCircleLine } from 'react-icons/ri';
@@ -9,14 +9,16 @@ interface ListItemProps {
   text: string;
   isCompleted: boolean;
   id: number;
+  color: string;
   onToggleComplete: (taskId: number) => void;
   onDelete: (taskId: number) => void;
 }
 
-const CreateItem: React.FC<ListItemProps> = ({
+const EditItem: React.FC<ListItemProps> = ({
   text,
   isCompleted,
   id,
+  color,
   onToggleComplete,
   onDelete,
 }) => {
@@ -32,8 +34,8 @@ const CreateItem: React.FC<ListItemProps> = ({
     'teal',
     'Khaki',
   ];
-  const [selectedColor, setSelectedColor] = useState<string>('red');
-  const [taskText, setTaskText] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>(color);
+  const [taskText, setTaskText] = useState<string>(text);
 
   const backToHome = () => {
     router.push('/');
@@ -43,7 +45,37 @@ const CreateItem: React.FC<ListItemProps> = ({
     setSelectedColor(color);
   };
 
-  const editTask = () => {};
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: taskText,
+          color: selectedColor,
+          isCompleted,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Task updated successfully');
+      } else {
+        alert('Failed to update task');
+      }
+    } catch (error) {
+      alert('An error occurred while updating the task');
+    }
+  };
+
+  useEffect(() => {
+    console.log('Text prop received:', text);
+    // Only update taskText if it's different from the current state
+    if (text !== taskText) {
+      setTaskText(text);
+    }
+  }, [text, taskText]);
 
   return (
     <div className='relative w-full'>
@@ -57,7 +89,6 @@ const CreateItem: React.FC<ListItemProps> = ({
         <p className='text-blue-400 font-bold py-2 mt-4'>Title</p>
         <input
           type='text'
-          placeholder='Ex. Brush your teeth'
           className='bg-zinc-600 h-8 w-full rounded-lg indent-2 p-2 text-sm text-white'
           value={taskText}
           onChange={(e) => setTaskText(e.target.value)}
@@ -80,7 +111,7 @@ const CreateItem: React.FC<ListItemProps> = ({
 
         {/* Add the task */}
         <div
-          onClick={editTask}
+          onClick={handleSave}
           className='flex flex-row w-full h-8 bg-blue-500 justify-center items-center rounded-lg border-2 border-transparent hover:border-white'
         >
           <p className='text-white text-sm font-semibold '>Save</p>
@@ -91,4 +122,4 @@ const CreateItem: React.FC<ListItemProps> = ({
   );
 };
 
-export default CreateItem;
+export default EditItem;
